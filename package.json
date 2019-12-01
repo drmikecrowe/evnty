@@ -6,6 +6,7 @@
   "types": "build/index.d.ts",
   "scripts": {
     "build": "rm -rf build && NODE_ENV=production tsc -d --rootDir src/ --outDir build",
+    "prepare": "npm run build",
     "test": "jest",
     "test:cov": "COVERAGE=true jest"
   },
