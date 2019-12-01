@@ -14,7 +14,7 @@ class FunctionExt extends Function {
 }
 
 function eventEmitter(listeners: Listeners, ...args: any[]) {
-  return Promise.all([...listeners].map(listener => listener(...args)));
+  return Promise.all([...listeners].slice(-1).map(listener => listener(...args)));
 }
 
 export class Event extends FunctionExt {
@@ -55,12 +55,12 @@ export class Event extends FunctionExt {
 
   off(listener: Listener): void {
     this.listeners.delete(listener);
-  };
+  }
 
   on(listener: Listener): Unsubscribe {
     this.listeners.add(listener);
     return () => this.off(listener);
-  };
+  }
 
   once(listener: Listener): Unsubscribe {
     const oneTimeListener = (...args: any[]) => {
@@ -68,47 +68,10 @@ export class Event extends FunctionExt {
       listener(...args);
     };
     return this.on(oneTimeListener);
-  };
+  }
 
   clear() {
     this.listeners.clear();
-  }
-
-  toPromise(): Promise<any[]> {
-    return new Promise(resolve => this.once((...args) => resolve(args)));
-  }
-
-  filter(filter: Filter) {
-    const dispose = this.on(async (...args) => {
-      if (filteredEvent.size > 0 && await filter(...args)) {
-        filteredEvent(...args);
-      }
-    });
-    const filteredEvent = new Event(dispose);
-    return filteredEvent;
-  }
-
-  map<T>(mapper: Mapper<T>) {
-    const dispose = this.on(async (...args) => {
-      if (mappedEvent.size > 0) {
-        const value = await mapper(...args);
-        mappedEvent(value);
-      }
-    });
-    const mappedEvent = new Event(dispose);
-    return mappedEvent;
-  }
-
-  reduce<T>(reducer: Reducer<T>, init: T) {
-    let value: T = init;
-    const dispose = this.on(async (...args) => {
-      if (reducedEvent.size > 0) {
-        value = await reducer(value, ...args);
-        reducedEvent(value);
-      }
-    });
-    const reducedEvent = new Event(dispose);
-    return reducedEvent;
   }
 }
 

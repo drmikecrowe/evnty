@@ -1,12 +1,32 @@
-# Evnty
+# Prioritized Evnty
 
-0-Deps, simple, fast, for browser and node js anonymous event library
+Based on [https://github.com/3axap4eHko/evnty](https://github.com/3axap4eHko/evnty)
 
-[![Coverage Status][codecov-image]][codecov-url]
-[![Build Status][travis-image]][travis-url]
-[![NPM version][npm-image]][npm-url]
-[![Downloads][downloads-image]][npm-url]
-[![Snyk][snyk-image]][snyk-url]
+Only fires event to the most recently added listener. Example:
+
+```typescript
+import event from "./src/index";
+
+const evt = event();
+
+const handler1 = (info: string) => console.log(`Handler 1 returned: ` + info);
+const unsubscribe1 = evt.on(handler1);
+
+const handler2 = (info: string) => console.log(`Handler 2 returned: ` + info);
+const unsubscribe2 = evt.on(handler2);
+
+const handler3 = (info: string) => console.log(`Handler 3 returned: ` + info);
+const unsubscribe3 = evt.on(handler3);
+
+evt("something");
+```
+
+yields:
+
+```
+$ ts-node test.ts
+Handler 3 returned: something
+```
 
 ## Interface
 
@@ -14,68 +34,59 @@
 declare type Unsubscribe = () => void;
 declare type Listener = (...args: any[]) => void;
 declare type Dispose = () => void;
-declare type Filter = (...args: any[]) => boolean;
-declare type Mapper = <T = any>(...args: any[]) => T;
-declare type Reducer = <T = any>(value: any, ...args: any[]) => T;
 
 declare class Event {
-    static merge(...events: Event[]): Event;
-    static interval(interval: number): Event;
+  static merge(...events: Event[]): Event;
+  static interval(interval: number): Event;
 
-    readonly size: Number;
+  readonly size: Number;
 
-    constructor(dispose?: Dispose);
-    has(listener: Listener): boolean;
-    off(listener: Listener): void;
-    on(listener: Listener): Unsubscribe;
-    once(listener: Listener): Unsubscribe;
-    clear(): void;
-    toPromise(): Promise<any[]>;
-    filter(filter: Filter): Event;
-    map(mapper: Mapper): Event;
-    reduce(reducer: Reducer, init: any): Event;
+  constructor(dispose?: Dispose);
+  has(listener: Listener): boolean;
+  off(listener: Listener): void;
+  on(listener: Listener): Unsubscribe;
+  once(listener: Listener): Unsubscribe;
+  clear(): void;
 }
 ```
 
 ## Usage
 
 ```js
-import event from 'evnty';
+import event from "evnty";
 
 function handleClick({ button }) {
-  console.log('Clicked button is', button);
+  console.log("Clicked button is", button);
 }
 const clickEvent = event();
 const unsubscribe = clickEvent.on(handleClick);
 
 const keyPressEvent = event();
 
-function handleInput({ button, key }) {
-
-}
+function handleInput({ button, key }) {}
 
 const inputEvent = Event.merge(clickEvent, keyPressEvent);
 inputEvent.on(handleInput);
 
 function handleLeftClick() {
-  console.log('Left button is clicked');
+  console.log("Left button is clicked");
 }
-const leftClickEvent = clickEvent.filter(({ button }) => button === 'left');
+const leftClickEvent = clickEvent.filter(({ button }) => button === "left");
 leftClickEvent.on(handleLeftClick);
 
-
-clickEvent({ button: 'right' });
-clickEvent({ button: 'left' });
-clickEvent({ button: 'middle' });
-keyPressEvent({ key: 'A' });
-keyPressEvent({ key: 'B' });
-keyPressEvent({ key: 'C' });
+clickEvent({ button: "right" });
+clickEvent({ button: "left" });
+clickEvent({ button: "middle" });
+keyPressEvent({ key: "A" });
+keyPressEvent({ key: "B" });
+keyPressEvent({ key: "C" });
 
 leftClickEvent.off(handleLeftClick);
 unsubscribe();
 ```
 
 ## License
+
 License [The MIT License](http://opensource.org/licenses/MIT)
 Copyright (c) 2019 Ivan Zakharchanka
 
