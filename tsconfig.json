@@ -6,16 +6,8 @@
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
-    "lib": [
-      "es2015.core",
-      "es6",
-      "dom"
-    ]
+    "lib": ["es2015.core", "es6", "dom"],
+    "types": ["node"]
   },
-  "exclude": [
-    "node_modules",
-    "src/**/__tests__",
-    "src/**/__fixtures__",
-    "src/**/__mocks__"
-  ]
+  "exclude": ["node_modules", "src/**/__tests__", "src/**/__fixtures__", "src/**/__mocks__"]
 }
